@@ -206,10 +206,21 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="lgM-78-0V7">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                                <color key="backgroundColor" name="YPBlack"/>
-                            </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" translatesAutoresizingMaskIntoConstraints="NO" id="CrD-Xh-Mjq">
+                                <rect key="frame" x="-20" y="-227" width="1640" height="1099"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="lgM-78-0V7">
+                                        <rect key="frame" x="20" y="20" width="1600" height="1059"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" name="YPBlack"/>
+                                    </imageView>
+                                </subviews>
+                                <viewLayoutGuide key="contentLayoutGuide" id="8yT-dG-kjI"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="Uha-kv-bwq"/>
+                                <connections>
+                                    <outlet property="delegate" destination="G86-gT-CWI" id="RkN-jf-ZjT"/>
+                                </connections>
+                            </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OHe-KE-vUB">
                                 <rect key="frame" x="9" y="9" width="44" height="44"/>
                                 <constraints>
@@ -222,21 +233,36 @@
                                     <action selector="didTapBackButton:" destination="G86-gT-CWI" eventType="touchUpInside" id="G6Z-eb-bf4"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pzJ-jm-HUW">
+                                <rect key="frame" x="171" y="785" width="51" height="51"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="51" id="Xuh-qd-TFF"/>
+                                    <constraint firstAttribute="width" constant="51" id="jQJ-I5-wow"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="sharing-button"/>
+                                <connections>
+                                    <action selector="didTapShareButton:" destination="G86-gT-CWI" eventType="touchUpInside" id="ctX-fs-y5a"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="d3z-3w-kzl"/>
                         <color key="backgroundColor" name="YPBlack"/>
                         <constraints>
+                            <constraint firstItem="pzJ-jm-HUW" firstAttribute="centerX" secondItem="74N-1W-eLh" secondAttribute="centerX" id="0AB-oQ-fkv"/>
                             <constraint firstItem="OHe-KE-vUB" firstAttribute="leading" secondItem="d3z-3w-kzl" secondAttribute="leading" constant="9" id="IKA-xn-toA"/>
-                            <constraint firstItem="lgM-78-0V7" firstAttribute="top" secondItem="74N-1W-eLh" secondAttribute="top" id="RIa-jd-iGI"/>
-                            <constraint firstAttribute="bottom" secondItem="lgM-78-0V7" secondAttribute="bottom" id="aAV-iU-1Bh"/>
+                            <constraint firstItem="d3z-3w-kzl" firstAttribute="trailing" secondItem="CrD-Xh-Mjq" secondAttribute="trailing" id="Nh1-KK-qUO"/>
+                            <constraint firstAttribute="bottom" secondItem="CrD-Xh-Mjq" secondAttribute="bottom" id="Seb-36-h1X"/>
+                            <constraint firstItem="CrD-Xh-Mjq" firstAttribute="top" secondItem="74N-1W-eLh" secondAttribute="top" id="Uqm-xu-rbj"/>
+                            <constraint firstItem="d3z-3w-kzl" firstAttribute="bottom" secondItem="pzJ-jm-HUW" secondAttribute="bottom" constant="16" id="WC1-dZ-Y7u"/>
+                            <constraint firstItem="CrD-Xh-Mjq" firstAttribute="leading" secondItem="d3z-3w-kzl" secondAttribute="leading" id="Ze0-bo-6ay"/>
                             <constraint firstItem="OHe-KE-vUB" firstAttribute="top" secondItem="d3z-3w-kzl" secondAttribute="top" constant="9" id="nk3-2s-cbw"/>
-                            <constraint firstAttribute="trailing" secondItem="lgM-78-0V7" secondAttribute="trailing" id="txm-iI-I6Z"/>
-                            <constraint firstItem="lgM-78-0V7" firstAttribute="leading" secondItem="74N-1W-eLh" secondAttribute="leading" id="xQS-WR-Krn"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="msZ-zc-rtZ"/>
                     <connections>
                         <outlet property="imageView" destination="lgM-78-0V7" id="qVq-ZU-VYA"/>
+                        <outlet property="scrollView" destination="CrD-Xh-Mjq" id="5N3-3Y-Cs8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J8r-2s-glX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -249,6 +275,7 @@
         <image name="Backward" width="24" height="24"/>
         <image name="exit" width="24" height="24"/>
         <image name="like_button_on" width="42" height="42"/>
+        <image name="sharing-button" width="51" height="51"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30.333333969116211" height="30"/>
         <image name="userpick" width="70" height="70"/>
