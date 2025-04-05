@@ -47,7 +47,7 @@ final class SingleImageViewController: UIViewController {
         
         let visibleRectSize = scrollView.bounds.size
         let imageSize = image.size
-    
+        
         
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height
@@ -69,4 +69,3 @@ extension SingleImageViewController: UIScrollViewDelegate {
         imageView
     }
 }
-
