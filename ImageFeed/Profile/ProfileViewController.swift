@@ -42,7 +42,7 @@ final class ProfileViewController: UIViewController {
         self.accountNameLabel = accountNameLabel
         self.descriptionLabel = descriptionLabel
         self.logoutButton = logoutButton
-    
+        
         
         [profileImageView, fullNameLabel, accountNameLabel, descriptionLabel, logoutButton].forEach {
             view.addSubview($0)
@@ -82,7 +82,7 @@ final class ProfileViewController: UIViewController {
             print("Error: Missing UI elements in setupConstraints")
             return
         }
-
+        
         NSLayoutConstraint.activate([
             profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
             profileImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
