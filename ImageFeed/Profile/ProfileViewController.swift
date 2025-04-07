@@ -5,52 +5,84 @@ final class ProfileViewController: UIViewController {
     private var accountNameLabel: UILabel?
     private var descriptionLabel: UILabel?
     private var profileImageView: UIImageView?
+    private var logoutButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         createUI()
-        
     }
-    func createUI() {
-        view.backgroundColor = UIColor(named: "YPBlack")
+    
+    private func createUI() {
+        view.backgroundColor = UIColor.ypBlack
         
-        let profileImageView = UIImageView()
-        profileImageView.image = UIImage(named: "avatar")
+        let profileImageView = createProfileImageView()
         
-        let fullNameLabel = UILabel()
-        fullNameLabel.text = "Екатерина Новикова"
-        fullNameLabel.textColor = UIColor(named: "YPWhite")
-        fullNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        let fullNameLabel = createLabel(
+            text: "Екатерина Новикова",
+            color: UIColor.ypWhite,
+            font: UIFont.systemFont(ofSize: 23, weight: .bold)
+        )
         
-        let accountNameLabel = UILabel()
-        accountNameLabel.text = "@ekaterina_nov"
-        accountNameLabel.textColor = UIColor(named: "YPGray")
-        accountNameLabel.font = UIFont.systemFont(ofSize: 13)
+        let accountNameLabel = createLabel(
+            text: "@ekaterina_nov",
+            color: UIColor.ypGray,
+            font: UIFont.systemFont(ofSize: 13)
+        )
         
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = "Hello, world!"
-        descriptionLabel.textColor = UIColor(named: "YPWhite")
-        descriptionLabel.font = UIFont.systemFont(ofSize: 13)
+        let descriptionLabel = createLabel(
+            text: "Hello, world!",
+            color: UIColor.ypWhite,
+            font: UIFont.systemFont(ofSize: 13)
+        )
+        
+        let logoutButton = createLogoutButton()
         
         self.profileImageView = profileImageView
         self.fullNameLabel = fullNameLabel
         self.accountNameLabel = accountNameLabel
         self.descriptionLabel = descriptionLabel
+        self.logoutButton = logoutButton
+    
         
-        let logoutButton = UIButton.systemButton(with: UIImage(named: "logout")!.withRenderingMode(.alwaysOriginal), target: self, action: #selector(buttonTapped))
+        [profileImageView, fullNameLabel, accountNameLabel, descriptionLabel, logoutButton].forEach {
+            view.addSubview($0)
+        }
         
-        profileImageView.translatesAutoresizingMaskIntoConstraints = false
-        fullNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        accountNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        logoutButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(profileImageView)
-        view.addSubview(fullNameLabel)
-        view.addSubview(accountNameLabel)
-        view.addSubview(descriptionLabel)
-        view.addSubview(logoutButton)
-        
+        setupConstraints()
+    }
+    
+    private func createProfileImageView() -> UIImageView {
+        let imageView = UIImageView()
+        imageView.image = UIImage.avatar
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }
+    
+    private func createLabel(text: String, color: UIColor, font: UIFont) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.textColor = color
+        label.font = font
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+    
+    private func createLogoutButton() -> UIButton {
+        let button = UIButton.systemButton(with: UIImage(named: "logout")!.withRenderingMode(.alwaysOriginal), target: self, action: #selector(buttonTapped))
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }
+    
+    private func setupConstraints() {
+        guard let profileImageView = profileImageView,
+              let fullNameLabel = fullNameLabel,
+              let accountNameLabel = accountNameLabel,
+              let descriptionLabel = descriptionLabel,
+              let logoutButton = logoutButton else {
+            print("Error: Missing UI elements in setupConstraints")
+            return
+        }
+
         NSLayoutConstraint.activate([
             profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
             profileImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
@@ -67,8 +99,8 @@ final class ProfileViewController: UIViewController {
             logoutButton.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor),
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
         ])
-        
     }
+    
     
     @objc func buttonTapped() {
         fullNameLabel?.removeFromSuperview()

@@ -11,7 +11,7 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
-    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet private weak var scrollView: UIScrollView!
     @IBOutlet private var imageView: UIImageView!
     
     override func viewDidLoad() {
@@ -48,6 +48,10 @@ final class SingleImageViewController: UIViewController {
         let visibleRectSize = scrollView.bounds.size
         let imageSize = image.size
         
+        guard imageSize.width != 0, imageSize.height != 0 else {
+            print("Error: width or height of the image equal zero")
+            return
+        }
         
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height
