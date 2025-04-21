@@ -1,16 +1,7 @@
-//
-//  AppDelegate.swift
-//  ImageFeed
-//
-//  Created by Sofya Tarnalitskaya on 20/03/2025.
-//
-
 import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         return true
