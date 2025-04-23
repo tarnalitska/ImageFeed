@@ -2,7 +2,10 @@ import WebKit
 
 final class AuthResetHelper {
     
-    static func resetLogin() {
+    static let shared = AuthResetHelper()
+    private init() {}
+    
+    func resetLogin() {
         
         OAuth2TokenStorage().clearToken()
         
@@ -12,7 +15,6 @@ final class AuthResetHelper {
         dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
             dataStore.removeData(ofTypes: dataTypes, for: records) {
                 print("🌐 WebView cookies and website data cleared")
-                
             }
         }
     }

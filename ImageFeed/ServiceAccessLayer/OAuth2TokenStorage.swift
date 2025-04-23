@@ -1,7 +1,7 @@
 import UIKit
 
 final class OAuth2TokenStorage {
-    let tokenKey = "OAuth2AccessToken"
+    private let tokenKey = "OAuth2AccessToken"
     
     var token: String? {
         get {
