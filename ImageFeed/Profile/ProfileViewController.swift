@@ -1,15 +1,34 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
+    
+    var profile: Profile?
+    let tokenStorage = OAuth2TokenStorage()
+    
     private var fullNameLabel: UILabel?
     private var accountNameLabel: UILabel?
     private var descriptionLabel: UILabel?
     private var profileImageView: UIImageView?
     private var logoutButton: UIButton?
     
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         createUI()
+        updateProfileDetails()
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) {
+                [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
     }
     
     private func createUI() {
@@ -101,6 +120,24 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
+    private func updateProfileDetails() {
+        guard let profile = profile else {
+            print("Profile not found")
+            return
+        }
+        
+        fullNameLabel?.text = profile.name
+        accountNameLabel?.text = profile.loginName
+        descriptionLabel?.text = profile.bio
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        // TODO: kingfisher upd
+    }
     
     @objc func buttonTapped() {
         fullNameLabel?.removeFromSuperview()
@@ -116,6 +153,5 @@ final class ProfileViewController: UIViewController {
         profileImageView?.tintColor = .gray
         profileImageView?.widthAnchor.constraint(equalToConstant: 75).isActive = true
         profileImageView?.heightAnchor.constraint(equalToConstant: 75).isActive = true
-        
     }
 }
