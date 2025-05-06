@@ -5,7 +5,7 @@ struct UserResult: Codable {
 }
 
 struct ProfileImage: Codable {
-    let medium: String
+    let large: String
 }
 
 final class ProfileImageService {
@@ -37,7 +37,7 @@ final class ProfileImageService {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
-                    let avatarURLString = response.profileImage.medium
+                    let avatarURLString = response.profileImage.large
                     self?.avatarURL = avatarURLString
                     completion(.success(avatarURLString))
                     
@@ -52,13 +52,13 @@ final class ProfileImageService {
                     var responseString = ""
                     
                     if let appError = error as? AppError {
-                            switch appError {
-                            case .httpStatusError(_, let data):
-                                responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
-                            default:
-                                break
-                            }
+                        switch appError {
+                        case .httpStatusError(_, let data):
+                            responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                        default:
+                            break
                         }
+                    }
                     print("Error while fetching profile image: \(error.localizedDescription)\nResponse: \(responseString)")
                     
                     completion(.failure(error))

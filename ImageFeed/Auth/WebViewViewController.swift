@@ -29,7 +29,7 @@ final class WebViewViewController: UIViewController {
              options: [.new],
              changeHandler: { [weak self] _, _ in
                  guard let self = self else { return }
-                     self.updateProgress()
+                 self.updateProgress()
              })
         loadAuthView()
     }

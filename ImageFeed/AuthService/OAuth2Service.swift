@@ -48,13 +48,13 @@ final class OAuth2Service {
                     var responseString = ""
                     
                     if let appError = error as? AppError {
-                            switch appError {
-                            case .httpStatusError(_, let data):
-                                responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
-                            default:
-                                break
-                            }
+                        switch appError {
+                        case .httpStatusError(_, let data):
+                            responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                        default:
+                            break
                         }
+                    }
                     print("Error while fetching OAuth token: \(error.localizedDescription)\nResponse: \(responseString)")
                     
                     completion(.failure(error))

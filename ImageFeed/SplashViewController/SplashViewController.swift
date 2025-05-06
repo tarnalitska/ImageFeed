@@ -8,8 +8,8 @@ final class SplashViewController: UIViewController {
     
     
     override func viewDidAppear(_ animated: Bool) {
-        AuthResetHelper.shared.resetLogin()
-
+        //AuthResetHelper.shared.resetLogin()
+        
         super.viewDidAppear(animated)
         
         if let token = storage.token {
@@ -31,20 +31,20 @@ final class SplashViewController: UIViewController {
     private func switchToTabBarController(with profile: Profile) {
         DispatchQueue.main.async {
             guard self != nil else { return }
-        
+            
             guard let window = UIApplication.shared.windows.first else {
                 assertionFailure("No available window")
                 return
             }
             
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-
+            
             guard let tabBarController = storyboard.instantiateViewController(withIdentifier: "TabBarViewController") as? UITabBarController,
-                          let profileViewController = tabBarController.viewControllers?.first(where: { $0 is ProfileViewController }) as? ProfileViewController else {
-                        assertionFailure("TabBarController or ProfileViewController not configured correctly")
-                        return
-                    }
-
+                  let profileViewController = tabBarController.viewControllers?.first(where: { $0 is ProfileViewController }) as? ProfileViewController else {
+                assertionFailure("TabBarController or ProfileViewController not configured correctly")
+                return
+            }
+            
             profileViewController.profile = profile
             
             window.rootViewController = tabBarController

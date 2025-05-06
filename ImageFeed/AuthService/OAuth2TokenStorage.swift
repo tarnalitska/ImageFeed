@@ -6,14 +6,18 @@ final class OAuth2TokenStorage {
     
     var token: String? {
         get {
-            UserDefaults.standard.string(forKey: tokenKey)
+            return KeychainWrapper.standard.string(forKey: tokenKey)
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: tokenKey)
+            if let value = newValue {
+                _ = KeychainWrapper.standard.set(value, forKey: tokenKey)
+            } else {
+                _ = KeychainWrapper.standard.removeObject(forKey: tokenKey)
+            }
         }
     }
     
     func clearToken() {
-        UserDefaults.standard.removeObject(forKey: tokenKey)
+        _ = KeychainWrapper.standard.removeObject(forKey: tokenKey)
     }
 }

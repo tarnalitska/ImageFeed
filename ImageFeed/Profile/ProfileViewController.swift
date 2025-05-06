@@ -75,6 +75,8 @@ final class ProfileViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage.avatar
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 35
         return imageView
     }
     
@@ -138,11 +140,17 @@ final class ProfileViewController: UIViewController {
             let url = URL(string: profileImageURL)
         else
         { return }
-        let processor = RoundCornerImageProcessor(cornerRadius: 50)
+        
+        let size = CGSize(width: 70, height: 70)
+        let processor = ResizingImageProcessor(referenceSize: size, mode: .aspectFill)
+        |> RoundCornerImageProcessor(cornerRadius: size.width / 2)
         
         profileImageView?.kf.setImage(with: url, options: [
-            .processor(processor)
-          ])
+            .processor(processor),
+            .scaleFactor(UIScreen.main.scale),
+            .transition(.fade(0.2)),
+            .cacheOriginalImage
+        ])
     }
     
     @objc func buttonTapped() {
