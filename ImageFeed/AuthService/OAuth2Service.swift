@@ -36,63 +36,33 @@ final class OAuth2Service {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponse, Error>) in
             DispatchQueue.main.async {
-                if let error = error {
-                    print("Error: network error")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.networkError(error)))
-                    }
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    
-                    print("Error: Unsplash service error — status: \(httpResponse.statusCode)")
-                    
-                    var errorBody: String?
-                    
-                    if let data = data {
-                        errorBody = String(data: data, encoding: .utf8)
-                        print("Response body: \(String(describing: errorBody))")
-                    }
-                    
-                    completion(.failure(AppError.httpStatusError(httpResponse.statusCode, errorBody)))
-                }
-                
-                guard let data = data else {
-                    print("Error: no data received from token request")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.noData))
-                    }
-                    return
-                }
-                
-                
-                do {
-                    let decoder = SnakeCaseJSONDecoder()
-                    
-                    let response = try decoder.decode(OAuthTokenResponse.self, from: data)
+                switch result {
+                case .success(let response):
                     let token = response.accessToken
-                    
                     self?.tokenStorage.token = token
                     print("✅ Token saved to UserDefaults: \(token)")
+                    completion(.success(token))
+                case .failure(let error):
+                    var responseString = ""
                     
-                    DispatchQueue.main.async {
-                        completion(.success(response.accessToken))
-                    }
+                    if let appError = error as? AppError {
+                            switch appError {
+                            case .httpStatusError(_, let data):
+                                responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                            default:
+                                break
+                            }
+                        }
+                    print("Error while fetching OAuth token: \(error.localizedDescription)\nResponse: \(responseString)")
                     
-                } catch {
-                    print("Decoding error: \(error) ")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.decodingError(error)))
-                    }
+                    completion(.failure(error))
                 }
                 self?.task = nil
                 self?.lastCode = nil
             }
+            
         }
         self.task = task
         task.resume()
@@ -123,5 +93,62 @@ final class OAuth2Service {
         var request = URLRequest(url: url)
         request.httpMethod = HTTPMethod.post.rawValue
         return request
+    }
+}
+
+extension URLSession {
+    func objectTask<T: Decodable>(
+        for request: URLRequest,
+        completion: @escaping (Result<T, Error>) -> Void
+    ) -> URLSessionTask {
+        let decoder = SnakeCaseJSONDecoder()
+        
+        let task = data(for: request) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let decodedObject = try decoder.decode(T.self, from: data)
+                    completion(.success(decodedObject))
+                } catch {
+                    print("Decoding error: \(error)")
+                    completion(.failure(AppError.decodingError(error)))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+        return task
+    }
+    
+    
+    func data(
+        for request: URLRequest,
+        completion: @escaping(Result<Data, Error>) -> Void
+    ) -> URLSessionTask {
+        let fulfillCompletionOnTheMainThread: (Result<Data, Error>) -> Void = { result in
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+        
+        let task = dataTask(with: request, completionHandler: { data, response, error in
+            if let data = data, let response = response, let statusCode = ( response as? HTTPURLResponse)?.statusCode {
+                if 200..<300 ~= statusCode {
+                    fulfillCompletionOnTheMainThread(.success(data))
+                } else {
+                    fulfillCompletionOnTheMainThread(
+                        .failure(AppError.httpStatusError(statusCode: statusCode, data: data)))
+                    print("dataTask error: \(statusCode)\nResponse: \(data)")
+                }
+            } else if let error = error {
+                print("dataTask request error: \(error)")
+                fulfillCompletionOnTheMainThread(.failure(AppError.urlRequestError(error)))
+            } else {
+                print("dataTask url session error")
+                fulfillCompletionOnTheMainThread(.failure(AppError.urlSessionError))
+            }
+        })
+        
+        return task
     }
 }

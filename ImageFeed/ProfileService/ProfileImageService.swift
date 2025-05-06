@@ -5,7 +5,7 @@ struct UserResult: Codable {
 }
 
 struct ProfileImage: Codable {
-    let small: String
+    let medium: String
 }
 
 final class ProfileImageService {
@@ -15,10 +15,10 @@ final class ProfileImageService {
     private init() {}
     
     private let storage = OAuth2TokenStorage()
+    let urlSession = URLSession.shared
     private (set) var avatarURL: String?
     
     func fetchProfileImageURL(username: String, completion: @escaping(Result <String, Error>) -> Void) {
-        
         assert(Thread.isMainThread)
         
         guard let authToken = storage.token else  {
@@ -33,47 +33,12 @@ final class ProfileImageService {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             DispatchQueue.main.async {
-                if let error = error {
-                    print("Error: network error")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.networkError(error)))
-                    }
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    
-                    print("Error: Unsplash service error — status: \(httpResponse.statusCode)")
-                    
-                    var errorBody: String?
-                    
-                    if let data = data {
-                        errorBody = String(data: data, encoding: .utf8)
-                        print("Response body: \(String(describing: errorBody))")
-                    }
-                    
-                    completion(.failure(AppError.httpStatusError(httpResponse.statusCode, errorBody)))
-                }
-                
-                guard let data = data else {
-                    print("Error: no data received from profile request")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.noData))
-                    }
-                    return
-                }
-                
-                do {
-                    let decoder = SnakeCaseJSONDecoder()
-                    let userResult = try decoder.decode(UserResult.self, from: data)
-                    
-                    let avatarURLString = userResult.profileImage.small
+                switch result {
+                case .success(let response):
+                    let avatarURLString = response.profileImage.medium
                     self?.avatarURL = avatarURLString
-    
                     completion(.success(avatarURLString))
                     
                     NotificationCenter.default
@@ -83,11 +48,20 @@ final class ProfileImageService {
                             userInfo: ["URL": avatarURLString]
                         )
                     
-                } catch {
-                    print("JSON parsing error: \(error)")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.decodingError(error)))
-                    }
+                case .failure(let error):
+                    var responseString = ""
+                    
+                    if let appError = error as? AppError {
+                            switch appError {
+                            case .httpStatusError(_, let data):
+                                responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                            default:
+                                break
+                            }
+                        }
+                    print("Error while fetching profile image: \(error.localizedDescription)\nResponse: \(responseString)")
+                    
+                    completion(.failure(error))
                 }
             }
         }

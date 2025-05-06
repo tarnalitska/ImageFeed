@@ -19,6 +19,7 @@ final class ProfileService {
     private init() {}
     
     private(set) var profile: Profile?
+    let urlSession = URLSession.shared
     
     func fetchProfile(_ authToken: String, completion: @escaping(Result <Profile, Error>) -> Void) {
         
@@ -30,61 +31,36 @@ final class ProfileService {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
-                if let error = error {
-                    print("Error: network error")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.networkError(error)))
-                    }
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    
-                    print("Error: Unsplash service error — status: \(httpResponse.statusCode)")
-                    
-                    var errorBody: String?
-                    
-                    if let data = data {
-                        errorBody = String(data: data, encoding: .utf8)
-                        print("Response body: \(String(describing: errorBody))")
-                    }
-                    
-                    completion(.failure(AppError.httpStatusError(httpResponse.statusCode, errorBody)))
-                }
-                
-                guard let data = data else {
-                    print("Error: no data received from profile request")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.noData))
-                    }
-                    return
-                }
-                
-                do {
-                    let decoder = SnakeCaseJSONDecoder()
-                    
-                    let profileResult = try decoder.decode(ProfileResult.self, from: data)
-                    
+                switch result {
+                case .success(let response):
                     let profile = Profile(
-                        username: profileResult.username,
-                        name: "\(profileResult.firstName) \(profileResult.lastName)",
-                        loginName: "@\(profileResult.username)",
-                        bio: profileResult.bio
+                        username: response.username,
+                        name: "\(response.firstName) \(response.lastName)",
+                        loginName: "@\(response.username)",
+                        bio: response.bio
                     )
-    
+                    
                     completion(.success(profile))
                     
-                } catch {
-                    print("JSON parsing error: \(error)")
-                    DispatchQueue.main.async {
-                        completion(.failure(AppError.decodingError(error)))
-                    }
+                case .failure(let error):
+                    var responseString = ""
+                    
+                    if let appError = error as? AppError {
+                            switch appError {
+                            case .httpStatusError(_, let data):
+                                responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                            default:
+                                break
+                            }
+                        }
+                    print("Error while fetching profile: \(error.localizedDescription)\nResponse: \(responseString)")
+                    
+                    completion(.failure(error))
                 }
             }
+            
         }
         task.resume()
     }

@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -135,8 +136,13 @@ final class ProfileViewController: UIViewController {
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
-        else { return }
-        // TODO: kingfisher upd
+        else
+        { return }
+        let processor = RoundCornerImageProcessor(cornerRadius: 50)
+        
+        profileImageView?.kf.setImage(with: url, options: [
+            .processor(processor)
+          ])
     }
     
     @objc func buttonTapped() {

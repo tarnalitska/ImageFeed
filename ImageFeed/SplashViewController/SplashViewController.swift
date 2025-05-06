@@ -84,7 +84,6 @@ extension SplashViewController: AuthViewControllerDelegate {
     
     private func fetchProfile(_ token: String) {
         var username: String?
-        
         UIBlockingProgressHUD.show()
         ProfileService.shared.fetchProfile(token) { [weak self] result in
             DispatchQueue.main.async {
@@ -95,6 +94,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                 switch result {
                 case .success(let profile):
                     username = profile.username
+                    self.fetchProfileImage(username: username)
                     self.switchToTabBarController(with: profile)
                     
                 case .failure(let error):
@@ -103,7 +103,9 @@ extension SplashViewController: AuthViewControllerDelegate {
                 }
             }
         }
-        
+    }
+    
+    func fetchProfileImage(username: String?){
         guard let username = username else {
             return
         }
@@ -112,14 +114,12 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success:
                 print("success!")
-                
             case .failure(let error):
                 assertionFailure("❌ Failed to fetch profile image with \(error)")
                 return
             }
         }
     }
-    
     
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         dismiss(animated: true) { [weak self] in
@@ -139,9 +139,20 @@ extension SplashViewController: AuthViewControllerDelegate {
                 guard let token = self.storage.token else { return }
                 self.fetchProfile(token)
             case .failure:
-                // TODO: Обработайте ошибку авторизации
+                showAuthErrorAlert()
                 break
             }
         }
+    }
+}
+
+extension SplashViewController {
+    private func showAuthErrorAlert() {
+        let alert = UIAlertController(
+            title: "Something went wrong",
+            message: "Login failed",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

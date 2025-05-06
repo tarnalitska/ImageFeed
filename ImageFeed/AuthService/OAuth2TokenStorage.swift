@@ -1,4 +1,5 @@
 import UIKit
+import SwiftKeychainWrapper
 
 final class OAuth2TokenStorage {
     private let tokenKey = "OAuth2AccessToken"
