@@ -53,13 +53,13 @@ final class ProfileImageService {
                     
                     if let appError = error as? AppError {
                         switch appError {
-                        case .httpStatusError(_, let data):
-                            responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response data"
+                        case .httpStatusError(let code, let data):
+                            responseString = String(data: data, encoding: .utf8) ?? "[dataTask]: Unable to decode response data, code: \(code)"
                         default:
                             break
                         }
                     }
-                    print("Error while fetching profile image: \(error.localizedDescription)\nResponse: \(responseString)")
+                    print("[dataTask]: Error while fetching profile image: \(error.localizedDescription)\nResponse: \(responseString)")
                     
                     completion(.failure(error))
                 }
