@@ -30,7 +30,7 @@ final class ProfileService {
             return
         }
         
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+        let task = urlSession.objectTask(for: request) { (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):

@@ -148,7 +148,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             return
         }
         
-        ProfileImageService.shared.fetchProfileImageURL(username: username) { [weak self] result in
+        ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
             switch result {
             case .success:
                 print("success!")

@@ -229,7 +229,7 @@
         <!--Navigation Controller-->
         <scene sceneID="k38-eu-cTH">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="KZW-tS-eZW" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="UINavigationController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="KZW-tS-eZW" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="mgO-eb-31s">
                         <rect key="frame" x="0.0" y="118" width="393" height="44"/>
