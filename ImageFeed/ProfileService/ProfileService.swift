@@ -3,7 +3,7 @@ import UIKit
 struct ProfileResult: Codable {
     let username: String
     let firstName: String
-    let lastName: String
+    let lastName: String?
     let bio: String?
 }
 
@@ -24,7 +24,6 @@ final class ProfileService {
     func fetchProfile(_ authToken: String, completion: @escaping(Result <Profile, Error>) -> Void) {
         
         assert(Thread.isMainThread)
-        
         guard let request = makeProfileRequest(authToken: authToken) else {
             print("Error: failed to create token request")
             completion(.failure(AppError.invalidRequest))
@@ -37,7 +36,7 @@ final class ProfileService {
                 case .success(let response):
                     let profile = Profile(
                         username: response.username,
-                        name: "\(response.firstName) \(response.lastName)",
+                        name: "\(response.firstName) \(response.lastName ?? "")",
                         loginName: "@\(response.username)",
                         bio: response.bio
                     )
@@ -60,7 +59,6 @@ final class ProfileService {
                     completion(.failure(error))
                 }
             }
-            
         }
         task.resume()
     }
@@ -77,5 +75,4 @@ final class ProfileService {
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         return request
     }
-    
 }

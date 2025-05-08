@@ -12,7 +12,7 @@ final class SplashViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        AuthResetHelper.shared.resetLogin()
+        //AuthResetHelper.shared.resetLogin()
         
         super.viewDidAppear(animated)
         
@@ -54,8 +54,6 @@ final class SplashViewController: UIViewController {
     
     private func switchToTabBarController(with profile: Profile) {
         DispatchQueue.main.async {
-            guard self != nil else { return }
-            
             guard let window = UIApplication.shared.windows.first else {
                 assertionFailure("No available window")
                 return
@@ -129,7 +127,6 @@ extension SplashViewController: AuthViewControllerDelegate {
         ProfileService.shared.fetchProfile(token) { [weak self] result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
-                
                 guard let self = self else { return }
                 
                 switch result {
@@ -166,10 +163,10 @@ extension SplashViewController: AuthViewControllerDelegate {
 extension SplashViewController {
     private func showAuthErrorAlert() {
         let alert = UIAlertController(
-            title: "Something went wrong",
-            message: "Login failed",
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
             preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
 }

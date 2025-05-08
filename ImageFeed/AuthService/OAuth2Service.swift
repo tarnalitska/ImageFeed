@@ -114,6 +114,7 @@ extension URLSession {
                     completion(.failure(AppError.decodingError(error)))
                 }
             case .failure(let error):
+                print("Data error: \(error)")
                 completion(.failure(error))
             }
         }
