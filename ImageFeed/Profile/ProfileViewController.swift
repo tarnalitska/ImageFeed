@@ -90,7 +90,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func createLogoutButton() -> UIButton {
-        let button = UIButton.systemButton(with: UIImage(named: "logout")!.withRenderingMode(.alwaysOriginal), target: self, action: #selector(buttonTapped))
+        let button = UIButton.systemButton(with: UIImage(named: "logout")!.withRenderingMode(.alwaysOriginal), target: self, action: #selector(logoutButtonTapped))
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
@@ -153,19 +153,18 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    @objc func buttonTapped() {
-        fullNameLabel?.removeFromSuperview()
-        fullNameLabel = nil
+    @objc func logoutButtonTapped() {
+        let alert = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
         
-        accountNameLabel?.removeFromSuperview()
-        accountNameLabel = nil
+        let logoutAction = UIAlertAction(title: "Да", style: .default) { _ in 
+            ProfileLogoutService.shared.logout()
+        }
         
-        descriptionLabel?.removeFromSuperview()
-        descriptionLabel = nil
+        let cancelAction = UIAlertAction(title: "Нет", style: .cancel)
         
-        profileImageView?.image = UIImage(systemName: "person.crop.circle.fill")
-        profileImageView?.tintColor = .gray
-        profileImageView?.widthAnchor.constraint(equalToConstant: 75).isActive = true
-        profileImageView?.heightAnchor.constraint(equalToConstant: 75).isActive = true
+        alert.addAction(logoutAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
     }
 }

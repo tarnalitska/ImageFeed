@@ -12,8 +12,6 @@ final class SplashViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        //AuthResetHelper.shared.resetLogin()
-        
         super.viewDidAppear(animated)
         
         if let token = storage.token {
@@ -38,7 +36,6 @@ final class SplashViewController: UIViewController {
         splashImageView.translatesAutoresizingMaskIntoConstraints = false
         splashImageView.image = UIImage(named: "splash_screen_logo")
         view.addSubview(splashImageView)
-        
         setupConstraints()
     }
     

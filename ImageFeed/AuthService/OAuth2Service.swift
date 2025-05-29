@@ -107,6 +107,11 @@ extension URLSession {
             switch result {
             case .success(let data):
                 do {
+                    if T.self == EmptyResponse.self && data.isEmpty {
+                        completion(.success(EmptyResponse() as! T))
+                        return
+                    }
+                    
                     let decodedObject = try decoder.decode(T.self, from: data)
                     completion(.success(decodedObject))
                 } catch {
