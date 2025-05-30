@@ -6,7 +6,7 @@ final class ProfileLogoutService {
     
     private init() {}
     
-    func logout() {
+    func logout(completion: @escaping () -> Void) {
         OAuth2TokenStorage().clearToken()
         cleanCookies()
         
@@ -15,13 +15,7 @@ final class ProfileLogoutService {
         ImagesListService.shared.clearPhotos()
         
         DispatchQueue.main.async {
-            guard let window = UIApplication.shared.windows.first else {
-                assertionFailure("No window found")
-                return
-            }
-            
-            let splashViewController = SplashViewController()
-            window.rootViewController = splashViewController
+            completion()
         }
         
     }

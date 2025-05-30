@@ -1,42 +1,5 @@
 import Foundation
 
-struct EmptyResponse: Decodable {}
-
-struct PhotoResult: Decodable {
-    let id: String
-    let createdAt: String
-    let updatedAt: String
-    let width: Int
-    let height: Int
-    let color: String?
-    let blurHash: String?
-    let likes: Int
-    let likedByUser: Bool
-    let description: String?
-    let urls: UrlsResult
-    
-}
-
-struct UrlsResult: Decodable {
-    let raw: String
-    let full: String
-    let regular: String
-    let small: String
-    let thumb: String
-}
-
-struct Photo {
-    let id: String
-    let size: CGSize
-    let createdAt: Date?
-    let isLiked: Bool
-    let description: String?
-    let thumbImageURL: String
-    let regularImageURL: String
-    let largeImageURL: String
-    let numberOfLikes: Int
-}
-
 final class ImagesListService {
     static let shared = ImagesListService()
     private init() {}
@@ -49,6 +12,11 @@ final class ImagesListService {
     
     private var lastLoadedPage = 0
     private var isFetching = false
+    
+    private static let iso8601DateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
     
     func loadNextPage(_ authToken: String) {
         assert(Thread.isMainThread)
@@ -70,21 +38,7 @@ final class ImagesListService {
             
             switch result {
             case .success(let photoResults):
-                let newPhotos: [Photo] = photoResults.map { result in
-                    Photo(
-                        id: result.id,
-                        size: CGSize(width: result.width, height: result.height),
-                        createdAt: ISO8601DateFormatter().date(from: result.createdAt),
-                        isLiked: result.likedByUser,
-                        description: result.description,
-                        thumbImageURL: result.urls.thumb,
-                        regularImageURL: result.urls.regular,
-                        largeImageURL: result.urls.full,
-                        numberOfLikes: result.likes
-                        
-                    )
-                }
-                
+                let newPhotos: [Photo] = photoResults.map { Photo(from: $0) }
                 self.photos.append(contentsOf: newPhotos)
                 self.lastLoadedPage += 1
                 
@@ -128,19 +82,7 @@ final class ImagesListService {
                     
                     if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                         let photo = self.photos[index]
-                        
-                        let newPhoto = Photo(
-                            id: photo.id,
-                            size: photo.size,
-                            createdAt: photo.createdAt,
-                            isLiked: !photo.isLiked,
-                            description: photo.description,
-                            thumbImageURL: photo.thumbImageURL,
-                            regularImageURL: photo.regularImageURL,
-                            largeImageURL: photo.largeImageURL,
-                            numberOfLikes: photo.numberOfLikes
-                        )
-                        
+                        let newPhoto = photo.toggledLike()
                         self.photos[index] = newPhoto
                         
                         NotificationCenter.default.post(

@@ -38,8 +38,6 @@ final class ImagesListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    
-    
     @objc private func didUpdatePhotos() {
         updateTableViewAnimated()
     }
@@ -87,7 +85,13 @@ final class ImagesListViewController: UIViewController {
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let photo = photos[indexPath.row]
-        cell.dateLabel.text = dateFormatter.string(from: photo.createdAt ?? Date())
+        
+        if let date = photo.createdAt {
+            cell.dateLabel.text = dateFormatter.string(from: date)
+        } else {
+            cell.dateLabel.text = ""
+        }
+        
         cell.setIsLiked(photo.isLiked)
     }
 }
@@ -163,11 +167,12 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 switch result {
                 case .success:
                     print("Like status changed successfully")
-                    UIBlockingProgressHUD.dismiss()
+                    
                 case .failure(let error):
                     print("Error during like tap: \(error.localizedDescription)")
-                    UIBlockingProgressHUD.dismiss()
                 }
+                
+                UIBlockingProgressHUD.dismiss()
             }
         }
     }

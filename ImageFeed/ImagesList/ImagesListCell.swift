@@ -20,7 +20,7 @@ final class ImagesListCell: UITableViewCell {
         cellImage.kf.indicatorType = .none
     }
     
-    @IBAction func likeButtonClicked(_ sender: UIButton) {
+    @IBAction private func likeButtonClicked(_ sender: UIButton) {
         delegate?.imageListCellDidTapLike(self)
     }
     

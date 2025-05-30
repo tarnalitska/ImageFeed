@@ -157,7 +157,17 @@ final class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
         
         let logoutAction = UIAlertAction(title: "Да", style: .default) { _ in 
-            ProfileLogoutService.shared.logout()
+            ProfileLogoutService.shared.logout { [weak self] in
+                guard self != nil else { return }
+                
+                guard let window = UIApplication.shared.windows.first else {
+                    assertionFailure("No window found")
+                    return
+                }
+                
+                let splashViewController = SplashViewController()
+                window.rootViewController = splashViewController
+            }
         }
         
         let cancelAction = UIAlertAction(title: "Нет", style: .cancel)
