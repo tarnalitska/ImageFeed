@@ -80,4 +80,8 @@ final class ProfileImageService {
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         return request
     }
+    
+    func clearAvatar() {
+        avatarURL = nil
+    }
 }
