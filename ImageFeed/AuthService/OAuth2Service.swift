@@ -83,7 +83,6 @@ final class OAuth2Service {
         "&&code=\(code)" +
         "&&grant_type=authorization_code"
         
-        
         guard let url = URL(
             string: urlString, relativeTo: baseURL) else {
             print("Error: Url components are missing for unsplash login")

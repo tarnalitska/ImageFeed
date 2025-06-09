@@ -9,8 +9,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let scene = (scene as? UIWindowScene) else { return }
         
+        let splashViewController = SplashViewController()
+        let navController = UINavigationController(rootViewController: splashViewController)
+        
         window = UIWindow(windowScene: scene)
-        window?.rootViewController = SplashViewController()
+        window?.rootViewController = navController
         window?.makeKeyAndVisible()
     }
     

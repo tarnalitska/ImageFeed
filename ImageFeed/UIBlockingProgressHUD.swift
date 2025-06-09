@@ -1,24 +1,33 @@
 import UIKit
 import ProgressHUD
 
+protocol LoadingIndicatorProtocol: AnyObject {
+    func show()
+    func dismiss()
+}
+
 final class UIBlockingProgressHUD {
     private static var window: UIWindow? {
         return UIApplication.shared.windows.first
     }
     
     static func configure() {
-          ProgressHUD.animationType = .activityIndicator
-          ProgressHUD.colorHUD = UIColor.ypBlack
-          ProgressHUD.colorAnimation = .lightGray
-      }
+        ProgressHUD.animationType = .activityIndicator
+        ProgressHUD.colorHUD = UIColor.ypBlack
+        ProgressHUD.colorAnimation = .lightGray
+    }
     
-    static func show() {
-        window?.isUserInteractionEnabled = false
+    func show() {
+        UIBlockingProgressHUD.window?.isUserInteractionEnabled = false
         ProgressHUD.animate()
     }
     
-    static func dismiss() {
-        window?.isUserInteractionEnabled = true
+    func dismiss() {
+        UIBlockingProgressHUD.window?.isUserInteractionEnabled = true
         ProgressHUD.dismiss()
     }
+    
+    static let shared = UIBlockingProgressHUD()
 }
+
+extension UIBlockingProgressHUD: LoadingIndicatorProtocol {}

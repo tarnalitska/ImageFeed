@@ -66,6 +66,9 @@ final class SplashViewController: UIViewController {
             
             profileViewController.profile = profile
             
+            let presenter = ProfilePresenter(view: profileViewController, profileService: ProfileService.shared, profileImageService: ProfileImageService.shared)
+            profileViewController.configure(presenter: presenter)
+            
             window.rootViewController = tabBarController
         }
     }
@@ -79,14 +82,14 @@ final class SplashViewController: UIViewController {
         
         authVC.delegate = self
         authVC.modalPresentationStyle = .fullScreen
-        present(authVC, animated: true, completion: nil)
+        navigationController?.pushViewController(authVC, animated: true)
     }
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         dismiss(animated: true) { [weak self] in
-            UIBlockingProgressHUD.show()
+            UIBlockingProgressHUD.shared.show()
             guard let self = self else { return }
             self.fetchOAuthToken(code)
         }
@@ -105,7 +108,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
             guard let self = self else { return }
-            UIBlockingProgressHUD.dismiss()
+            UIBlockingProgressHUD.shared.dismiss()
             
             switch result {
             case .success:
@@ -120,10 +123,10 @@ extension SplashViewController: AuthViewControllerDelegate {
     
     private func fetchProfile(_ token: String) {
         var username: String?
-        UIBlockingProgressHUD.show()
+        UIBlockingProgressHUD.shared.show()
         ProfileService.shared.fetchProfile(token) { [weak self] result in
             DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
+                UIBlockingProgressHUD.shared.dismiss()
                 guard let self = self else { return }
                 
                 switch result {
