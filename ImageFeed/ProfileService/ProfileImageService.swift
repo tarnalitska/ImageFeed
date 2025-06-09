@@ -10,13 +10,13 @@ struct ProfileImage: Codable {
 
 final class ProfileImageService {
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidchange")
-    
     static let shared = ProfileImageService()
+    
     private init() {}
     
     private let storage = OAuth2TokenStorage()
     let urlSession = URLSession.shared
-    private(set) var avatarURL: String?
+    var avatarURL: String?
     
     func fetchProfileImageURL(username: String, completion: @escaping(Result <String, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -85,3 +85,5 @@ final class ProfileImageService {
         avatarURL = nil
     }
 }
+
+extension ProfileImageService: ProfileImageServiceProtocol {}

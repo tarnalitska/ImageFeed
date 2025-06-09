@@ -1,25 +1,16 @@
 import UIKit
 
-struct ProfileResult: Codable {
-    let username: String
-    let firstName: String
-    let lastName: String?
-    let bio: String?
-}
-
-struct Profile {
-    let username: String
-    let name: String
-    let loginName: String
-    let bio: String?
-}
-
 final class ProfileService {
     static let shared = ProfileService()
     private init() {}
     
     private(set) var profile: Profile?
+    
     let urlSession = URLSession.shared
+    
+    func getProfile() -> Profile? {
+        return profile
+    }
     
     func fetchProfile(_ authToken: String, completion: @escaping(Result <Profile, Error>) -> Void) {
         
@@ -40,6 +31,7 @@ final class ProfileService {
                         loginName: "@\(response.username)",
                         bio: response.bio
                     )
+                    self.profile = profile
                     
                     completion(.success(profile))
                     
@@ -80,3 +72,5 @@ final class ProfileService {
         profile = nil
     }
 }
+
+extension ProfileService: ProfileServiceProtocol {}

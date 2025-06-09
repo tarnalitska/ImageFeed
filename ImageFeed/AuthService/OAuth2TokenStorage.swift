@@ -1,6 +1,10 @@
 import UIKit
 import SwiftKeychainWrapper
 
+protocol OAuth2TokenStorageProtocol: AnyObject {
+    var token: String? { get }
+}
+
 final class OAuth2TokenStorage {
     private let tokenKey = "OAuth2AccessToken"
     
@@ -21,3 +25,5 @@ final class OAuth2TokenStorage {
         _ = KeychainWrapper.standard.removeObject(forKey: tokenKey)
     }
 }
+
+extension OAuth2TokenStorage: OAuth2TokenStorageProtocol {}

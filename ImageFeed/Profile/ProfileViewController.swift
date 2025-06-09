@@ -1,35 +1,34 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get set }
+    func show(profile: ProfileViewModel)
+    func updateAvatar(with url: URL)
+    func showLogoutAlert()
+    func navigateToSplash()
+}
+
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
+    var presenter: ProfilePresenterProtocol?
     
     var profile: Profile?
     let tokenStorage = OAuth2TokenStorage()
     
-    private var fullNameLabel: UILabel?
-    private var accountNameLabel: UILabel?
-    private var descriptionLabel: UILabel?
+    var fullNameLabel: UILabel?
+    var accountNameLabel: UILabel?
+    var descriptionLabel: UILabel?
     private var profileImageView: UIImageView?
-    private var logoutButton: UIButton?
-    
-    private var profileImageServiceObserver: NSObjectProtocol?
+    var logoutButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         createUI()
-        updateProfileDetails()
-        
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) {
-                [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
-        updateAvatar()
+        presenter?.viewDidLoad()
+    }
+    
+    func configure(presenter: ProfilePresenterProtocol) {
+        self.presenter = presenter
     }
     
     private func createUI() {
@@ -92,6 +91,7 @@ final class ProfileViewController: UIViewController {
     private func createLogoutButton() -> UIButton {
         let button = UIButton.systemButton(with: UIImage(named: "logout")!.withRenderingMode(.alwaysOriginal), target: self, action: #selector(logoutButtonTapped))
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.accessibilityIdentifier = "logout_button"
         return button
     }
     
@@ -123,24 +123,13 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func updateProfileDetails() {
-        guard let profile = profile else {
-            print("Profile not found")
-            return
-        }
-        
+    func show(profile: ProfileViewModel){
         fullNameLabel?.text = profile.name
-        accountNameLabel?.text = profile.loginName
+        accountNameLabel?.text = profile.login
         descriptionLabel?.text = profile.bio
     }
     
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else
-        { return }
-        
+    func updateAvatar(with url: URL) {
         let size = CGSize(width: 70, height: 70)
         let processor = ResizingImageProcessor(referenceSize: size, mode: .aspectFill)
         |> RoundCornerImageProcessor(cornerRadius: size.width / 2)
@@ -154,27 +143,26 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc func logoutButtonTapped() {
+        presenter?.didTapLogout()
+    }
+    
+    func showLogoutAlert() {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
         
-        let logoutAction = UIAlertAction(title: "Да", style: .default) { _ in 
-            ProfileLogoutService.shared.logout { [weak self] in
-                guard self != nil else { return }
-                
-                guard let window = UIApplication.shared.windows.first else {
-                    assertionFailure("No window found")
-                    return
-                }
-                
-                let splashViewController = SplashViewController()
-                window.rootViewController = splashViewController
-            }
-        }
-        
-        let cancelAction = UIAlertAction(title: "Нет", style: .cancel)
-        
-        alert.addAction(logoutAction)
-        alert.addAction(cancelAction)
-        
+        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
+            self?.presenter?.confirmLogout()
+        })
+        alert.addAction(UIAlertAction(title: "Нет", style: .cancel))
         present(alert, animated: true)
+    }
+    
+    func navigateToSplash() {
+        guard let window = UIApplication.shared.windows.first else {
+            assertionFailure("No window found")
+            return
+        }
+        let splashViewController = SplashViewController()
+        let navigationController = UINavigationController(rootViewController: splashViewController)
+        window.rootViewController = navigationController
     }
 }

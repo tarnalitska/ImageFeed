@@ -1,5 +1,14 @@
 import Foundation
 
+protocol ImagesListServiceProtocol: AnyObject {
+    var photos: [Photo] { get }
+    func loadNextPage(_ authToken: String, completion: ((Result<Void, Error>) -> Void)?)
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void)
+    
+    static var didChangeNotification: Notification.Name { get }
+}
+
+
 final class ImagesListService {
     static let shared = ImagesListService()
     private init() {}
@@ -18,7 +27,7 @@ final class ImagesListService {
         return formatter
     }()
     
-    func loadNextPage(_ authToken: String) {
+    func loadNextPage(_ authToken: String, completion: ((Result<Void, Error>) -> Void)? = nil) {
         assert(Thread.isMainThread)
         
         guard !isFetching else { return }
@@ -148,3 +157,5 @@ private extension ImagesListService {
         return request
     }
 }
+
+extension ImagesListService: ImagesListServiceProtocol {}
